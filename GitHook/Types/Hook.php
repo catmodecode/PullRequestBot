@@ -53,7 +53,7 @@ class Hook implements HookType
         $requiredEvent = ['*', 'pull_request'];
 
         $events = $payload->get('hook')->get('events');
-        if (count(array_intersect($requiredEvent, $events)) > 0) {
+        if (count(array_intersect($requiredEvent, $events)) == 0) {
             $message = implode("\n", [
                 'Error!',
                 'You should select "pull request" option',
@@ -61,21 +61,30 @@ class Hook implements HookType
                 'Repository: ' . $repo->get('full_name'),
                 'Url: ' . $repo->get('html_url'),
             ]);
-        };
-
-        if ($events == ['*']) {
-            $message .= "\n\n" . implode("\n", [
-                'Notice!',
-                'You chose all events. Some of them may not be available.',
-            ]);
         } else {
-            $otherEvents = array_diff($events, [$requiredEvent]);
-            if (count($otherEvents) > 0) {
+            $message = implode("\n", [
+                'New webhook!',
+                $this->getZen(),
+                'Webhook url: ' . $payload->get('hook')->get('config')->get('url'),
+                'Author: ' . $payload->get('sender')->get('login'),
+                'Repository: ' . $repo->get('full_name'),
+                'Url: ' . $repo->get('html_url')
+            ]);
+
+            if ($events == ['*']) {
                 $message .= "\n\n" . implode("\n", [
                     'Notice!',
-                    'These methods are not yet available.:',
-                    implode(', ', $otherEvents),
+                    'You chose all events. Some of them may not be available.',
                 ]);
+            } else {
+                $otherEvents = array_diff($events, [$requiredEvent]);
+                if (count($otherEvents) > 0) {
+                    $message .= "\n\n" . implode("\n", [
+                        'Notice!',
+                        'These methods are not yet available.:',
+                        implode(', ', $otherEvents),
+                    ]);
+                }
             }
         }
 
