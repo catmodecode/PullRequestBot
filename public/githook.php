@@ -1,9 +1,17 @@
 <?php
 
-$app = require_once __DIR__ . '/../app.php';
+use App\App;
+use App\Facade\Response;
+use App\Facade\Telegram;
 
-$app->run();
+require_once __DIR__ . '/../vendor/autoload.php';
 
-$input = file_get_contents('php://input');
+App::run();
 
-echo 'OK!';
+$gitHook = App::$gitHook;
+$telegram = App::$telegram;
+
+$message = $gitHook->getWebhook()->getMessage();
+$sendResult = Telegram::send($message);
+
+Response::json(['status' => 'ok']);

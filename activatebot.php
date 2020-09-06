@@ -1,10 +1,12 @@
 <?php
 
-$app = require_once __DIR__ . '/app.php';
+use App\App;
 
-$app->run();
+require_once __DIR__ . '/vendor/autoload.php';
 
-$telegram = $app->telegram;
+App::run();
+
+$telegram = App::$telegram;
 
 $hookParams = ['url' => $_ENV['TELEGRAM_HOOK_URL']];
 $result = $telegram->setWebhook($hookParams);
