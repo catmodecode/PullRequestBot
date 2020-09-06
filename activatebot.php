@@ -13,5 +13,5 @@ try {
     $result = $telegram->setWebhook($hookParams);
     echo "\nHook registered. Now send any message to bot, he will reply your uid\n";
 } catch (Exception $e) {
-    echo $e->getMessage();
+    echo "\n" . $e->getMessage() . "\n";
 }
