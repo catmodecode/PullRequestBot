@@ -1,7 +1,7 @@
 GitHub -> Telegram PHP pull request spamer
 ==========================================
 
-# Setup
+## Setup
 
 See [Bots: An introduction for developers](https://core.telegram.org/bots)
 
@@ -15,9 +15,11 @@ See [Bots: An introduction for developers](https://core.telegram.org/bots)
 
 1.  set up .env
 
+    Copy .env.example to .env
+
     ```bash
     #Telegram
-    TELEGRAM_SECRET=Telegram_secret
+    TELEGRAM_SECRET=**Telegram_secret**
     TELEGRAM_HOOK_URL=https://**yourdomain**/telehook.php
     TELEGRAM_UID=-1 #Leave this for now
 
@@ -35,6 +37,16 @@ See [Bots: An introduction for developers](https://core.telegram.org/bots)
     
     Get uid from bot and enter it in **TELEGRAM_UID** section of .env
 
+    ```bash
+    #Telegram
+    TELEGRAM_SECRET=Telegram_secret
+    TELEGRAM_HOOK_URL=https://yourdomain/telehook.php
+    TELEGRAM_UID=**your_uid**
+
+    #GitHub
+    GITHUB_SECRET=github_secret
+    ```
+
 1.  Go to your GitHub repository **Settings** -> **Webhooks** -> **Add webhook**
 
     Set up your **Payload URL** for ex. https://mydomain.com/githook.php
@@ -42,6 +54,16 @@ See [Bots: An introduction for developers](https://core.telegram.org/bots)
     Set Content type to **application/json**
 
     Set up your ```Github secret```
+
+    ```bash
+    #Telegram
+    TELEGRAM_SECRET=Telegram_secret
+    TELEGRAM_HOOK_URL=https://yourdomain/telehook.php
+    TELEGRAM_UID=your_uid
+
+    #GitHub
+    GITHUB_SECRET=**github_secret**
+    ```
 
     Chose radio **Let me select individual events** and select **Pull requests**
 
