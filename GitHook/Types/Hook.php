@@ -14,11 +14,7 @@ class Hook implements HookType
      */
     public function __construct($load)
     {
-        if ($this->checkSignature($load)) {
-            $this->payload = new HookPayload($load);
-        } else {
-            Response::error('Wrong signature', 403);
-        }
+        $this->payload = new HookPayload($load);
     }
 
     /**
