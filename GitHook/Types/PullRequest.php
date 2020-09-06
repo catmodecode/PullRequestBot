@@ -2,9 +2,10 @@
 
 namespace GitHook\Types;
 
+use App\Facade\Response;
 use GitHook\HookPayload;
 
-class Hook implements HookType
+class PullRequest implements HookType
 {
     protected HookPayload $payload;
 
@@ -39,38 +40,43 @@ class Hook implements HookType
      */
     public function getMessage(): string
     {
+        $eventMessages = [
+            'opened' => 'New pull request!',
+            'edited' => 'Pull request was edited!',
+            'assigned' => 'Pull request was assigned!',
+            'unassigned' => 'Pull request was unassigned!',
+            'review_requested' => 'Review requested!',
+            'review_request_removed' => 'Review request removed!',
+            'ready_for_review' => 'Ready for review!',
+            'reopened' => 'Pull request was reopened!',
+            'synchronize' => 'Pull request was updated!'
+        ];
         $payload = $this->payload;
+        $pullRequest = $payload->get('pull_request');
         $repo = $payload->get('repository');
-        $requiredEvent = 'pull_request';
-        
-        $events = $payload->get('hook')->get('events');
-        if (!in_array($requiredEvent, $events)) {
-            $message = implode("\n", [
-                'Error!',
-                'You should select "pull request" option',
-                'Author: ' . $payload->get('sender')->get('login'),
-                'Repository: ' . $repo->get('full_name'),
-                'Url: ' . $repo->get('html_url'),
-            ]);
-        } else {
-            $message = implode("\n", [
-                'New webhook!',
-                $this->getZen(),
-                'Webhook url: ' . $payload->get('hook')->get('config')->get('url'),
-                'Author: ' . $payload->get('sender')->get('login'),
-                'Repository: ' . $repo->get('full_name'),
-                'Url: ' . $repo->get('html_url')
-            ]);
 
-            $otherEvents = array_diff($events, [$requiredEvent]);
-            if(count($otherEvents) > 0) {
-                $message .= "\n\n" . implode("\n", [
-                    'Notice!',
-                    'These methods are not yet available.:',
-                    implode(', ', $otherEvents),
-                ]);
-            }
+        $event = $payload->get('action');
+
+        if (!in_array($event, array_keys($eventMessages))) {
+            Response::error('No action needed', 418);
         }
+
+        $eventMessage = $eventMessages[$event];
+
+        $message = implode("\n", [
+            $eventMessage,
+            $pullRequest->get('title'),
+            '',
+            'From '
+                . $pullRequest->get('head')->get('ref')
+                .  ' to '
+                . $pullRequest->get('base')->get('ref'),
+            'Url: ' . $pullRequest->get('html_url'),
+            'Author: ' . $payload->get('sender')->get('login'),
+            '',
+            'Repository: ' . $repo->get('full_name'),
+            'Repo url: ' . $repo->get('html_url')
+        ]);
 
         return $message;
     }

@@ -14,4 +14,4 @@ $telegram = App::$telegram;
 $message = $gitHook->getWebhook()->getMessage();
 $sendResult = Telegram::send($message);
 
-Response::json(['status' => 'ok']);
+Response::success('ok');

@@ -8,6 +8,13 @@ class Telegram
 {
     private static $userId;
 
+    /**
+     * Send message to user stored in .env TELEGRAM_UID;
+     * 
+     * @param string $text
+     * 
+     * @return array
+     */
     public static function send(string $text)
     {
         if (!isset(Telegram::$userId)) {

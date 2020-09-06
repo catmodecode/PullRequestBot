@@ -2,6 +2,7 @@
 
 namespace GitHook\Types;
 
+use App\Facade\Response;
 use GitHook\HookPayload;
 
 class Hook implements HookType
@@ -13,7 +14,11 @@ class Hook implements HookType
      */
     public function __construct($load)
     {
-        $this->payload = new HookPayload($load);
+        if ($this->checkSignature($load)) {
+            $this->payload = new HookPayload($load);
+        } else {
+            Response::error('Wrong signature', 403);
+        }
     }
 
     /**
@@ -50,7 +55,7 @@ class Hook implements HookType
         $payload = $this->payload;
         $repo = $payload->get('repository');
         $requiredEvent = 'pull_request';
-        
+
         $events = $payload->get('hook')->get('events');
         if (!in_array($requiredEvent, $events)) {
             $message = implode("\n", [
@@ -71,7 +76,7 @@ class Hook implements HookType
             ]);
 
             $otherEvents = array_diff($events, [$requiredEvent]);
-            if(count($otherEvents) > 0) {
+            if (count($otherEvents) > 0) {
                 $message .= "\n\n" . implode("\n", [
                     'Notice!',
                     'These methods are not yet available.:',

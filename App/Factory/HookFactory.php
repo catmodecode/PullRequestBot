@@ -2,8 +2,7 @@
 
 namespace App\Factory;
 
-use GitHook\Types\Hook;
-use GitHook\Types\HookType;
+use GitHook\Types\{Hook, HookType, PullRequest};
 
 class HookFactory
 {
@@ -19,8 +18,11 @@ class HookFactory
     {
         $payload = json_decode($load, true);
 
-        if (array_key_exists('zen', $payload) || array_key_exists('hook', $payload)) {
+        if (array_key_exists('hook', $payload)) {
             return Hook::class;
+        }
+        if (array_key_exists('pull_request', $payload)) {
+            return PullRequest::class;
         }
         return null;
     }

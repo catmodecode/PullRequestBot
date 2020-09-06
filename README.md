@@ -6,7 +6,7 @@ GitHub -> Telegram PHP pull request spamer
 See [Bots: An introduction for developers](https://core.telegram.org/bots)
 
 1.  ```bash
-    git clone blahblah PullRequestBot
+    git clone https://github.com/catmodecode/PullRequestBot.git PullRequestBot
     ```
 1.  ```bash
     composer install

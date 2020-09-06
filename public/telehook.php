@@ -8,8 +8,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 App::run();
 
 if($_ENV['TELEGRAM_UID']>0) {
-    Response::json(['error' => 'Uid already set'], 400);
-    die();
+    Response::error('Uid already set', 400);
 }
 
 $telegram = App::$telegram;
@@ -22,4 +21,4 @@ $messageResult = $telegram->sendMessage([
     'text' => 'Your id is "' . $uid . '". Store it in .env TELEGRAM_UID section.'
 ]);
 
-Response::json($messageResult);
+Response::success('ok' , 200, $messageResult);
