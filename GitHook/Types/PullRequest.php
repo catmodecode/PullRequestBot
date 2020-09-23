@@ -3,6 +3,7 @@
 namespace GitHook\Types;
 
 use App\Facade\Response;
+use Exception;
 use GitHook\HookPayload;
 
 class PullRequest implements HookType
@@ -11,6 +12,9 @@ class PullRequest implements HookType
 
     /**
      * @param json string|array $load
+     * 
+     * @throws JsonException if $load is string and it is a wrong json object
+     * @throws InvalidArgumentException if $load is not a string or an array
      */
     public function __construct($load)
     {
@@ -58,7 +62,7 @@ class PullRequest implements HookType
         $event = $payload->get('action');
 
         if (!in_array($event, array_keys($eventMessages))) {
-            Response::error('No action needed', 418);
+            throw new Exception('No action needed');
         }
 
         $eventMessage = $eventMessages[$event];

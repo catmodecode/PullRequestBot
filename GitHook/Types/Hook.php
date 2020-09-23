@@ -11,6 +11,9 @@ class Hook implements HookType
 
     /**
      * @param json string|array $load
+     * 
+     * @throws JsonException if $load is string and it is a wrong json object
+     * @throws InvalidArgumentException if $load is not a string or an array
      */
     public function __construct($load)
     {

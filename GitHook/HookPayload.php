@@ -10,18 +10,24 @@ class HookPayload
 
     /**
      * @param json string|array $load
+     * @throws JsonException if $load is string and it is a wrong json object
+     * @throws InvalidArgumentException if $load is not a string or an array
      */
     public function __construct($load)
     {
-        if(!is_string($load) && !is_array($load) || (is_string($load) && json_decode($load) == null)){
-            throw new InvalidArgumentException('load must be array or string');
+        if (
+            !is_string($load) &&
+            !is_array($load) ||
+            (is_string($load) && json_decode($load, true, 512, JSON_THROW_ON_ERROR) == null)
+        ) {
+            throw new InvalidArgumentException('load must be array or json string');
         }
 
         $payload = is_string($load)
             ? json_decode($load, true)
             : $load;
-        foreach($payload as $key => &$value){
-            if(is_array($value) && HookPayload::isAssoc($value)){
+        foreach ($payload as &$value) {
+            if (is_array($value) && HookPayload::isAssoc($value)) {
                 $value = new HookPayload($value);
             }
         }

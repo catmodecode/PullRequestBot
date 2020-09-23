@@ -4,8 +4,13 @@ namespace GitHook;
 
 use App\Facade\Response;
 use App\Factory\HookFactory;
-use GitHook\Types\Hook;
 use GitHook\Types\HookType;
+use GitHook\Exceptions\{
+    SignatureException,
+    ExtensionMissingException,
+    UnsupportedHashAlgoException,
+    HookMismatchException
+};
 
 /**
  * Base class to work with github webhooks
@@ -21,24 +26,39 @@ class GitHook
         $this->secret = $secret;
     }
 
+    /**
+     * @param mixed $load
+     * 
+     * @return bool
+     * 
+     * returns true or throws one of exceptions below
+     * 
+     * @throws JsonException if incoming input is invalid json
+     * @throws SignatureException if 'X-Hub-Signature' is missing
+     * @throws ExtensionMissingException if 'hash' extension is missing
+     * @throws UnsupportedHashAlgoException if 'hash algorithm is not supported
+     * @throws HookMismatchException if stored and github hooks are mismatch
+     */
     private function checkSignature($load): bool
     {
         $hookSecret = $this->secret;
 
         if ($hookSecret !== '') {
             if (!isset($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
-                Response::error("HTTP header 'X-Hub-Signature' is missing.");
+                throw new SignatureException("HTTP header 'X-Hub-Signature' is missing.");
             } elseif (!extension_loaded('hash')) {
-                Response::error("Missing 'hash' extension to check the secret code validity.");
+                throw new ExtensionMissingException(
+                    "Missing 'hash' extension to check the secret code validity."
+                );
             }
 
             list($algo, $hash) = explode('=', $_SERVER['HTTP_X_HUB_SIGNATURE'], 2) + array('', '');
             if (!in_array($algo, hash_algos(), true)) {
-                Response::error("Hash algorithm '$algo' is not supported.");
+                throw new UnsupportedHashAlgoException("Hash algorithm '$algo' is not supported.");
             }
 
             if (!hash_equals($hash, hash_hmac($algo, $load, $hookSecret))) {
-                Response::error('Hook secret does not match.');
+                throw new HookMismatchException('Hook secret does not match.');
             }
         };
         return true;
@@ -48,6 +68,12 @@ class GitHook
      * Load json from github webhook
      * 
      * @return void
+     * 
+     * @throws JsonException if incoming input is invalid json
+     * @throws SignatureException if 'X-Hub-Signature' is missing
+     * @throws ExtensionMissingException if 'hash' extension is missing
+     * @throws UnsupportedHashAlgoException if 'hash algorithm is not supported
+     * @throws HookMismatchException if stored and github hooks are mismatch
      */
     public function getWebhook(): HookType
     {
